@@ -1,49 +1,48 @@
-import { Link } from "react-router-dom";
-import { Zap, Twitter, Facebook, Linkedin, Instagram } from "lucide-react";
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { Zap, Twitter, Facebook, Linkedin, Instagram, Github } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const footerLinks = {
-    Company: [
-      { name: "About Us", href: "/about" },
-      { name: "Careers", href: "/careers" },
-      { name: "Contact", href: "/contact" },
-      { name: "Blog", href: "/blogs" },
+    Explore: [
+      { name: "Home", href: "/" },
+      { name: "Tasks", href: "/worker/jobs" },
+      { name: "Employers", href: "/employers" },
+      { name: "Workers", href: "/workers" },
     ],
-    Workers: [
-      { name: "Find Tasks", href: "/worker/jobs" },
-      { name: "How it Works", href: "/how-it-works" },
-      { name: "Success Stories", href: "/success-stories" },
-      { name: "Worker Support", href: "/support" },
-    ],
-    Employers: [
-      { name: "Post a Task", href: "/employer/create-task" },
-      { name: "Pricing", href: "/pricing" },
-      { name: "Enterprise", href: "/enterprise" },
-      { name: "Employer Guide", href: "/employer-guide" },
+    Resources: [
+      { name: "Blogs", href: "/blogs" },
+      { name: "Payments", href: "/payments" },
+      { name: "Sign In", href: "/signin" },
+      { name: "Admin", href: "/admin" },
     ],
     Legal: [
       { name: "Terms of Service", href: "/terms" },
       { name: "Privacy Policy", href: "/privacy" },
       { name: "Cookie Policy", href: "/cookies" },
-      { name: "Security", href: "/security" },
     ],
   };
 
   const socialLinks = [
-    { icon: Twitter, href: "https://twitter.com/taskflow", name: "Twitter" },
-    { icon: Facebook, href: "https://facebook.com/taskflow", name: "Facebook" },
-    { icon: Linkedin, href: "https://linkedin.com/company/taskflow", name: "LinkedIn" },
-    { icon: Instagram, href: "https://instagram.com/taskflow", name: "Instagram" },
+    { icon: Twitter, href: "https://twitter.com/", name: "Twitter" },
+    { icon: Linkedin, href: "https://www.linkedin.com/", name: "LinkedIn" },
+    { icon: Github, href: "https://github.com/", name: "GitHub" },
+    { icon: Instagram, href: "https://instagram.com/", name: "Instagram" },
   ];
 
   return (
-    <footer className="bg-muted/50 border-t mt-auto">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
-          {/* Brand Section */}
-          <div className="lg:col-span-2">
+    <footer className="relative mt-16 border-t border-border bg-background/60 backdrop-blur">
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+        className="container mx-auto px-4 py-10"
+      >
+        <div className="grid gap-8 md:grid-cols-3">
+          <div>
             <Link to="/" className="flex items-center space-x-2 mb-4">
               <div className="p-2 bg-gradient-primary rounded-lg">
                 <Zap className="h-6 w-6 text-primary-foreground" />
@@ -52,57 +51,65 @@ const Footer = () => {
                 TaskFlow
               </span>
             </Link>
-            <p className="text-muted-foreground mb-6 max-w-sm">
-              Connect with skilled workers worldwide. Get tasks done efficiently and earn money from anywhere.
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              A modern microworkers-style marketplace: post tasks, complete micro-jobs, and
+              grow earnings with transparent fees and clean UX.
             </p>
-            <div className="flex space-x-4">
+            <div className="mt-4 flex items-center gap-3">
               {socialLinks.map(({ icon: Icon, href, name }) => (
-                <a
+                <motion.a
                   key={name}
                   href={href}
-                  className="text-muted-foreground hover:text-primary transition-colors"
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noreferrer"
+                  whileHover={{ y: -2 }}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                   aria-label={name}
+                  title={name}
                 >
-                  <Icon className="h-5 w-5" />
-                </a>
+                  <Icon className="h-4 w-4" />
+                </motion.a>
               ))}
             </div>
           </div>
 
-          {/* Footer Links */}
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
-              <h3 className="font-semibold text-foreground mb-4">{category}</h3>
-              <ul className="space-y-3">
-                {links.map((link) => (
-                  <li key={link.name}>
-                    <Link
-                      to={link.href}
-                      className="text-muted-foreground hover:text-primary transition-colors text-sm"
-                    >
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+          <div className="md:col-span-2">
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3">
+              {Object.entries(footerLinks).map(([category, links]) => (
+                <div key={category}>
+                  <h4 className="text-sm font-semibold text-foreground">{category}</h4>
+                  <ul className="mt-3 space-y-2 text-sm">
+                    {links.map((link) => (
+                      <li key={link.name}>
+                        <Link 
+                          to={link.href}
+                          className="text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          {link.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-
-        {/* Bottom Section */}
-        <div className="border-t pt-8 mt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-muted-foreground text-sm">
-            © {currentYear} TaskFlow. All rights reserved.
-          </p>
-          <div className="flex items-center space-x-6 mt-4 md:mt-0">
-            <span className="text-sm text-muted-foreground">
-              Secure payments powered by industry leaders
-            </span>
           </div>
         </div>
-      </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+          className="mt-8 flex flex-col items-start justify-between gap-4 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row"
+        >
+          <p>© {currentYear} TaskFlow. Built for speed & clarity.</p>
+          <p>Designed with React, Tailwind CSS, and Framer Motion.</p>
+        </motion.div>
+      </motion.div>
+
+      {/* gradient accent */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 -bottom-1 h-[2px] bg-gradient-to-r from-primary via-accent to-secondary" />
     </footer>
   );
 };

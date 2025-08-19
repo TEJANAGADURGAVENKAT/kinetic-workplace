@@ -30,6 +30,11 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminCampaigns from "./pages/admin/AdminCampaigns";
 import AdminDisputes from "./pages/admin/AdminDisputes";
 import AdminFinancials from "./pages/admin/AdminFinancials";
+import Employers from "./pages/Employers";
+import Workers from "./pages/Workers";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Cookies from "./pages/Cookies";
 import NotFound from "./pages/NotFound";
 
 // Layout Components
@@ -83,8 +88,17 @@ const AppRoutes = () => {
           <Route path="/blogs" element={<PageTransition><BlogList /></PageTransition>} />
           <Route path="/blog/:id" element={<PageTransition><BlogDetail /></PageTransition>} />
           
+          {/* Information Pages */}
+          <Route path="/employers" element={<PageTransition><Employers /></PageTransition>} />
+          <Route path="/workers" element={<PageTransition><Workers /></PageTransition>} />
+          
           {/* Payment Routes */}
           <Route path="/payments" element={<PageTransition><Payments /></PageTransition>} />
+          
+          {/* Legal Pages */}
+          <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
+          <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
+          <Route path="/cookies" element={<PageTransition><Cookies /></PageTransition>} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<PageTransition><AdminDashboard /></PageTransition>} />
