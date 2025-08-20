@@ -14,33 +14,131 @@ export type Database = {
   }
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          role?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      task_submissions: {
+        Row: {
+          id: string
+          proof_files: string[] | null
+          proof_text: string | null
+          reviewed_at: string | null
+          reviewer_notes: string | null
+          status: string
+          submitted_at: string
+          task_id: string
+          worker_id: string
+        }
+        Insert: {
+          id?: string
+          proof_files?: string[] | null
+          proof_text?: string | null
+          reviewed_at?: string | null
+          reviewer_notes?: string | null
+          status?: string
+          submitted_at?: string
+          task_id: string
+          worker_id: string
+        }
+        Update: {
+          id?: string
+          proof_files?: string[] | null
+          proof_text?: string | null
+          reviewed_at?: string | null
+          reviewer_notes?: string | null
+          status?: string
+          submitted_at?: string
+          task_id?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_submissions_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tasks: {
         Row: {
           assigned_to: string | null
+          budget: number | null
+          category: string | null
+          completed_slots: number | null
           created_at: string | null
           created_by: string | null
           description: string | null
+          expires_at: string | null
           id: string
+          requirements: string | null
+          slots: number | null
           status: string | null
           title: string
+          updated_at: string | null
         }
         Insert: {
           assigned_to?: string | null
+          budget?: number | null
+          category?: string | null
+          completed_slots?: number | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          expires_at?: string | null
           id?: string
+          requirements?: string | null
+          slots?: number | null
           status?: string | null
           title: string
+          updated_at?: string | null
         }
         Update: {
           assigned_to?: string | null
+          budget?: number | null
+          category?: string | null
+          completed_slots?: number | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
+          expires_at?: string | null
           id?: string
+          requirements?: string | null
+          slots?: number | null
           status?: string | null
           title?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -91,7 +189,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role: "admin" | "employee" | "employer/worker"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -218,6 +316,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["admin", "employee", "employer/worker"],
+    },
   },
 } as const

@@ -3,33 +3,18 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-import { useLocation } from "react-router-dom";
+import Navigation from "./components/layout/Navigation";
+import Footer from "./components/layout/Footer";
+import { AuthProvider } from "@/hooks/useAuth";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
-// Pages
-import Index from "./pages/Index";
+// Auth pages
 import SignIn from "./pages/auth/SignIn";
 import Register from "./pages/auth/Register";
-import WorkerDashboard from "./pages/worker/WorkerDashboard";
-import WorkerJobs from "./pages/worker/WorkerJobs";
-import WorkerTasks from "./pages/worker/WorkerTasks";
-import WorkerEarnings from "./pages/worker/WorkerEarnings";
-import WorkerProfile from "./pages/worker/WorkerProfile";
-import TaskDetail from "./pages/worker/TaskDetail";
-import EmployerDashboard from "./pages/employer/EmployerDashboard";
-import EmployerCampaigns from "./pages/employer/EmployerCampaigns";
-import CreateTask from "./pages/employer/CreateTask";
-import SubmissionsReview from "./pages/employer/SubmissionsReview";
-import EmployerPayments from "./pages/employer/EmployerPayments";
-import EmployerTaskDetail from "./pages/employer/EmployerTaskDetail";
-import BlogList from "./pages/blog/BlogList";
-import BlogDetail from "./pages/blog/BlogDetail";
-import Payments from "./pages/Payments";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminUsers from "./pages/admin/AdminUsers";
-import AdminCampaigns from "./pages/admin/AdminCampaigns";
-import AdminDisputes from "./pages/admin/AdminDisputes";
-import AdminFinancials from "./pages/admin/AdminFinancials";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+
+// Public pages
+import Index from "./pages/Index";
 import Employers from "./pages/Employers";
 import Workers from "./pages/Workers";
 import Terms from "./pages/Terms";
@@ -37,95 +22,168 @@ import Privacy from "./pages/Privacy";
 import Cookies from "./pages/Cookies";
 import NotFound from "./pages/NotFound";
 
-// Layout Components
-import Navigation from "./components/layout/Navigation";
-import Footer from "./components/layout/Footer";
+// Worker pages
+import WorkerDashboard from "./pages/worker/WorkerDashboard";
+import WorkerJobs from "./pages/worker/WorkerJobs";
+import WorkerTasks from "./pages/worker/WorkerTasks";
+import WorkerEarnings from "./pages/worker/WorkerEarnings";
+import WorkerProfile from "./pages/worker/WorkerProfile";
+import TaskDetail from "./pages/worker/TaskDetail";
+
+// Employer pages
+import EmployerDashboard from "./pages/employer/EmployerDashboard";
+import EmployerCampaigns from "./pages/employer/EmployerCampaigns";
+import CreateTask from "./pages/employer/CreateTask";
+import SubmissionsReview from "./pages/employer/SubmissionsReview";
+import EmployerPayments from "./pages/employer/EmployerPayments";
+import EmployerTaskDetail from "./pages/employer/EmployerTaskDetail";
+
+// Blog pages
+import BlogList from "./pages/blog/BlogList";
+import BlogDetail from "./pages/blog/BlogDetail";
+
+// Payment pages
+import Payments from "./pages/Payments";
+
+// Admin pages
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminCampaigns from "./pages/admin/AdminCampaigns";
+import AdminDisputes from "./pages/admin/AdminDisputes";
+import AdminFinancials from "./pages/admin/AdminFinancials";
 
 const queryClient = new QueryClient();
 
-const PageTransition = ({ children }: { children: React.ReactNode }) => {
+function App() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-    >
-      {children}
-    </motion.div>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <div className="min-h-screen bg-background">
+              <Navigation />
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<Index />} />
+                <Route path="/employers" element={<Employers />} />
+                <Route path="/workers" element={<Workers />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/cookies" element={<Cookies />} />
+                <Route path="/payments" element={<Payments />} />
+
+                {/* Auth Routes */}
+                <Route path="/signin" element={<SignIn />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+
+                {/* Worker Routes */}
+                <Route path="/worker" element={
+                  <ProtectedRoute allowedRoles={['worker']}>
+                    <WorkerDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/worker/jobs" element={
+                  <ProtectedRoute allowedRoles={['worker']}>
+                    <WorkerJobs />
+                  </ProtectedRoute>
+                } />
+                <Route path="/worker/tasks" element={
+                  <ProtectedRoute allowedRoles={['worker']}>
+                    <WorkerTasks />
+                  </ProtectedRoute>
+                } />
+                <Route path="/worker/earnings" element={
+                  <ProtectedRoute allowedRoles={['worker']}>
+                    <WorkerEarnings />
+                  </ProtectedRoute>
+                } />
+                <Route path="/worker/profile" element={
+                  <ProtectedRoute allowedRoles={['worker']}>
+                    <WorkerProfile />
+                  </ProtectedRoute>
+                } />
+                <Route path="/worker/task/:id" element={
+                  <ProtectedRoute allowedRoles={['worker']}>
+                    <TaskDetail />
+                  </ProtectedRoute>
+                } />
+
+                {/* Employer Routes */}
+                <Route path="/employer" element={
+                  <ProtectedRoute allowedRoles={['employee']}>
+                    <EmployerDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/employer/campaigns" element={
+                  <ProtectedRoute allowedRoles={['employee']}>
+                    <EmployerCampaigns />
+                  </ProtectedRoute>
+                } />
+                <Route path="/employer/create-task" element={
+                  <ProtectedRoute allowedRoles={['employee']}>
+                    <CreateTask />
+                  </ProtectedRoute>
+                } />
+                <Route path="/employer/submissions" element={
+                  <ProtectedRoute allowedRoles={['employee']}>
+                    <SubmissionsReview />
+                  </ProtectedRoute>
+                } />
+                <Route path="/employer/payments" element={
+                  <ProtectedRoute allowedRoles={['employee']}>
+                    <EmployerPayments />
+                  </ProtectedRoute>
+                } />
+                <Route path="/employer/task/:id" element={
+                  <ProtectedRoute allowedRoles={['employee']}>
+                    <EmployerTaskDetail />
+                  </ProtectedRoute>
+                } />
+
+                {/* Blog Routes */}
+                <Route path="/blog" element={<BlogList />} />
+                <Route path="/blog/:id" element={<BlogDetail />} />
+
+                {/* Admin Routes */}
+                <Route path="/admin" element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/users" element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminUsers />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/campaigns" element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminCampaigns />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/disputes" element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminDisputes />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/financials" element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminFinancials />
+                  </ProtectedRoute>
+                } />
+
+                {/* Catch-all route */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <Footer />
+            </div>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
-};
-
-const AppRoutes = () => {
-  const location = useLocation();
-
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Navigation />
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<PageTransition><Index /></PageTransition>} />
-          <Route path="/signin" element={<PageTransition><SignIn /></PageTransition>} />
-          <Route path="/register" element={<PageTransition><Register /></PageTransition>} />
-          
-          {/* Worker Routes */}
-          <Route path="/worker" element={<PageTransition><WorkerDashboard /></PageTransition>} />
-          <Route path="/worker/jobs" element={<PageTransition><WorkerJobs /></PageTransition>} />
-          <Route path="/worker/tasks" element={<PageTransition><WorkerTasks /></PageTransition>} />
-          <Route path="/worker/earnings" element={<PageTransition><WorkerEarnings /></PageTransition>} />
-          <Route path="/worker/profile" element={<PageTransition><WorkerProfile /></PageTransition>} />
-          <Route path="/worker/task/:id" element={<PageTransition><TaskDetail /></PageTransition>} />
-          
-          {/* Employer Routes */}
-          <Route path="/employer" element={<PageTransition><EmployerDashboard /></PageTransition>} />
-          <Route path="/employer/campaigns" element={<PageTransition><EmployerCampaigns /></PageTransition>} />
-          <Route path="/employer/create-task" element={<PageTransition><CreateTask /></PageTransition>} />
-          <Route path="/employer/submissions" element={<PageTransition><SubmissionsReview /></PageTransition>} />
-          <Route path="/employer/payments" element={<PageTransition><EmployerPayments /></PageTransition>} />
-          <Route path="/employer/task/:id" element={<PageTransition><EmployerTaskDetail /></PageTransition>} />
-          
-          {/* Blog Routes */}
-          <Route path="/blogs" element={<PageTransition><BlogList /></PageTransition>} />
-          <Route path="/blog/:id" element={<PageTransition><BlogDetail /></PageTransition>} />
-          
-          {/* Information Pages */}
-          <Route path="/employers" element={<PageTransition><Employers /></PageTransition>} />
-          <Route path="/workers" element={<PageTransition><Workers /></PageTransition>} />
-          
-          {/* Payment Routes */}
-          <Route path="/payments" element={<PageTransition><Payments /></PageTransition>} />
-          
-          {/* Legal Pages */}
-          <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
-          <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
-          <Route path="/cookies" element={<PageTransition><Cookies /></PageTransition>} />
-          
-          {/* Admin Routes */}
-          <Route path="/admin" element={<PageTransition><AdminDashboard /></PageTransition>} />
-          <Route path="/admin/users" element={<PageTransition><AdminUsers /></PageTransition>} />
-          <Route path="/admin/campaigns" element={<PageTransition><AdminCampaigns /></PageTransition>} />
-          <Route path="/admin/disputes" element={<PageTransition><AdminDisputes /></PageTransition>} />
-          <Route path="/admin/financials" element={<PageTransition><AdminFinancials /></PageTransition>} />
-          
-          {/* Catch-all route */}
-          <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
-        </Routes>
-      </AnimatePresence>
-      <Footer />
-    </div>
-  );
-};
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+}
 
 export default App;

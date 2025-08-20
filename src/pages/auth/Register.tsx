@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,15 +19,16 @@ import {
   Briefcase,
   ArrowLeft
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const Register = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { signUp, user, profile, loading } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    userType: "",
+    userType: "" as 'employee' | 'worker' | '',
     firstName: "",
     lastName: "",
     email: "",
@@ -36,51 +37,53 @@ const Register = () => {
     agreeToTerms: false
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Redirect authenticated users
+  useEffect(() => {
+    if (user && profile && !loading) {
+      const dashboardRoute = profile.role === 'admin' ? '/admin' : 
+                            profile.role === 'employee' ? '/employer' : '/worker';
+      navigate(dashboardRoute, { replace: true });
+    }
+  }, [user, profile, loading, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (currentStep === 1) {
       if (!formData.userType) {
-        toast({
-          title: "Please select user type",
-          description: "Choose whether you want to be a Worker or Employer",
-          variant: "destructive"
-        });
         return;
       }
       setCurrentStep(2);
     } else {
       // Validate form
       if (formData.password !== formData.confirmPassword) {
-        toast({
-          title: "Password mismatch",
-          description: "Please ensure both passwords match",
-          variant: "destructive"
-        });
         return;
       }
 
       if (!formData.agreeToTerms) {
-        toast({
-          title: "Terms required",
-          description: "Please agree to the terms and conditions",
-          variant: "destructive"
-        });
         return;
       }
 
-      // Mock registration
-      toast({
-        title: "Account created successfully!",
-        description: `Welcome to TaskFlow as a ${formData.userType}`,
-      });
-
-      // Redirect to appropriate dashboard
-      if (formData.userType === 'worker') {
-        navigate('/worker');
-      } else {
-        navigate('/employer');
+      if (!formData.userType || (formData.userType !== 'employee' && formData.userType !== 'worker')) {
+        return;
       }
+
+      setIsSubmitting(true);
+      
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+      const { error } = await signUp(
+        formData.email, 
+        formData.password, 
+        fullName, 
+        formData.userType
+      );
+
+      if (!error) {
+        // Registration successful - user will be redirected automatically after email verification
+        navigate('/signin');
+      }
+      
+      setIsSubmitting(false);
     }
   };
 
@@ -144,7 +147,7 @@ const Register = () => {
                     <motion.div
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                        className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
                         formData.userType === 'worker' 
                           ? 'border-primary bg-primary/5' 
                           : 'border-muted hover:border-muted-foreground/30'
@@ -169,23 +172,23 @@ const Register = () => {
                     <motion.div
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                        formData.userType === 'employer' 
+                        className={`flex items-center space-x-3 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                        formData.userType === 'employee' 
                           ? 'border-primary bg-primary/5' 
                           : 'border-muted hover:border-muted-foreground/30'
                       }`}
                     >
-                      <RadioGroupItem value="employer" id="employer" />
+                      <RadioGroupItem value="employee" id="employee" />
                       <div className="flex items-center space-x-3 flex-1">
                         <div className="p-2 bg-primary/10 rounded-lg">
                           <Briefcase className="h-6 w-6 text-primary" />
                         </div>
                         <div>
-                          <Label htmlFor="employer" className="text-base font-medium cursor-pointer">
-                            I want to hire workers
+                          <Label htmlFor="employee" className="text-base font-medium cursor-pointer">
+                            I want to post tasks (Employee)
                           </Label>
                           <p className="text-sm text-muted-foreground">
-                            Post tasks and get them done
+                            Create and manage tasks for workers
                           </p>
                         </div>
                       </div>
@@ -319,8 +322,9 @@ const Register = () => {
                   type="submit" 
                   className="flex-1 bg-gradient-primary hover:bg-primary-dark"
                   size="lg"
+                  disabled={isSubmitting || (currentStep === 2 && (!formData.email || !formData.password || !formData.firstName))}
                 >
-                  {currentStep === 1 ? "Continue" : "Create Account"}
+                  {isSubmitting ? "Creating Account..." : currentStep === 1 ? "Continue" : "Create Account"}
                 </Button>
               </div>
             </form>

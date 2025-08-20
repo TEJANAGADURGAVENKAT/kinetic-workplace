@@ -1,41 +1,54 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Zap, Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const location = useLocation();
+  const { signIn, user, profile, loading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Mock authentication - in real app this would call an API
-    if (formData.email && formData.password) {
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully signed in.",
-      });
-      
-      // Simulate redirect based on user type (mock logic)
-      const isWorker = formData.email.includes('worker');
-      if (isWorker) {
-        navigate('/worker');
-      } else {
-        navigate('/employer');
-      }
+  // Redirect authenticated users
+  useEffect(() => {
+    if (user && profile && !loading) {
+      const from = location.state?.from?.pathname || getDashboardRoute(profile.role);
+      navigate(from, { replace: true });
     }
+  }, [user, profile, loading, navigate, location]);
+
+  const getDashboardRoute = (role: string) => {
+    switch (role) {
+      case 'admin': return '/admin';
+      case 'employee': return '/employer';
+      case 'worker': return '/worker';
+      default: return '/';
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    const { error } = await signIn(formData.email, formData.password);
+    
+    if (!error && profile) {
+      const from = location.state?.from?.pathname || getDashboardRoute(profile.role);
+      navigate(from, { replace: true });
+    }
+    
+    setIsSubmitting(false);
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -124,8 +137,9 @@ const SignIn = () => {
                 type="submit" 
                 className="w-full bg-gradient-primary hover:bg-primary-dark"
                 size="lg"
+                disabled={isSubmitting || !formData.email || !formData.password}
               >
-                Sign In
+                {isSubmitting ? "Signing In..." : "Sign In"}
               </Button>
             </form>
 
